@@ -28,12 +28,41 @@ class Display:
         # Set Window Size
         self.window.geometry("600x600")
 
+        # Column Configuration Check
+        self.col0 = False
+        self.col4 = False
+        self.col5 = False # Should stay false
+
+        # Row Configuration Check
+        self.row0 = False
+        self.row15 = False
+        self.row16 = False # Should stay false
+
         # Configure the rows and columns for grid
+        for col in range(0, 5):
+            self.window.columnconfigure(col, weight=1)
+            if col == 0:
+                self.col0 = True
+            if col == 4:
+                self.col4 = True
+            if col == 5: # Check to make sure we stop at 4
+                self.col5 = True
+        '''
         self.window.columnconfigure(0, weight=1)
         self.window.columnconfigure(1, weight=1)
         self.window.columnconfigure(2, weight=1)
         self.window.columnconfigure(3, weight=1)
         self.window.columnconfigure(4, weight=1)
+        '''
+        for row in range(0, 16):
+            self.window.rowconfigure(row, weight=1)
+            if row == 0:
+                self.row0 = True
+            if row == 15:
+                self.row15 = True
+            if row == 16: # Check to make sure we stop at 15
+                self.row16 = True
+        """
         self.window.rowconfigure(0, weight=1)
         self.window.rowconfigure(1, weight=1)
         self.window.rowconfigure(2, weight=1)
@@ -50,6 +79,8 @@ class Display:
         self.window.rowconfigure(13, weight=1)
         self.window.rowconfigure(14, weight=1)
         self.window.rowconfigure(15, weight=1)
+        """
+        
 
         # Initialize the variables
         self.user = ""
@@ -59,6 +90,47 @@ class Display:
         self.time_out = ""
         self.system_info = self.read_system_info()
         self.submit_button_exists = True
+
+        # Active Widget List
+        self.active_widgets = []
+
+        # Test Rows and Columns
+        self.regression_test()
+
+    def regression_test(self):
+        """
+        Regression test the program
+        Inputs: None
+        Outputs: None
+        """
+
+        # Test the rows and columns
+        self.test_rows()
+        self.test_columns()
+
+    def test_rows(self):
+        """
+        Test the rows
+        Inputs: None
+        Outputs: None
+        """
+
+        # Test the rows
+        assert(self.row0 == True)
+        assert(self.row15 == True)
+        assert(self.row16 == False)
+
+    def test_columns(self):
+        """
+        Test the columns
+        Inputs: None
+        Outputs: None
+        """
+
+        # Test the columns
+        assert(self.col0 == True)
+        assert(self.col4 == True)
+        assert(self.col5 == False)
 
     def read_system_info(self):
         """
@@ -163,6 +235,19 @@ class Display:
         with open("Budget (classes)/Files/budget_portfolio.json", "w") as file:
             json.dump(self.portfolio, file)
 
+    def destroy_widgets(self):
+        """
+        Destroys all the widgets
+        Inputs: None
+        Outputs: None
+        """
+
+        # Destroy all the widgets
+        for widget in self.active_widgets:
+            widget.destroy()
+
+        assert(len(self.active_widgets) == 0)
+
     def get_user_name(self):
         """
         Identifies the user
@@ -183,6 +268,14 @@ class Display:
         self.warning_label.grid(row=6, column=2)
         self.exit_button = tk.Button(text="Exit", command=self.leave)
         self.exit_button.grid(row=5, column=2)
+
+        # Add widgets to active widgets list
+        self.active_widgets.append(self.label)
+        self.active_widgets.append(self.button)
+        self.active_widgets.append(self.button2)
+        self.active_widgets.append(self.exit_button)
+        self.active_widgets.append(self.warning_label)
+
         self.window.mainloop()
 
     def _user_jaden(self):
@@ -192,12 +285,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        # Destroy the previous widgets
-        self.label.destroy()
-        self.button.destroy()
-        self.button2.destroy()
-        self.exit_button.destroy()
-        self.warning_label.destroy()
+        # Destroy the active widgets
+        self.destroy_widgets()
+
         self.user = "Jaden"
 
         # Call new action
@@ -211,11 +301,7 @@ class Display:
         """
 
         # Destroy the previous widgets
-        self.label.destroy()
-        self.button.destroy()
-        self.button2.destroy()
-        self.exit_button.destroy()
-        self.warning_label.destroy()
+        self.destroy_widgets()
         self.user = "Jacob"
 
         # Call new action
@@ -259,6 +345,14 @@ class Display:
         self.button.grid(row=5, column=3)
         self.exit_button = tk.Button(text="Exit", command=self.leave)
         self.exit_button.grid(row=5, column=1)
+
+        # Add widgets to active widgets list
+        self.active_widgets.append(self.g_label)
+        self.active_widgets.append(self.button)
+        self.active_widgets.append(self.exit_button)
+        if self.user == "Jaden":
+            self.active_widgets.append(self.label2)
+
         self.window.mainloop()
         
     def get_user(self):
@@ -281,11 +375,7 @@ class Display:
         """
 
         # Destroy the previous widgets
-        if self.get_user() == "Jaden":
-            self.label2.destroy()
-        self.g_label.destroy()
-        self.button.destroy()
-        self.exit_button.destroy()
+        self.destroy_widgets()
 
         # Call new action
         self.main_menu()
@@ -297,14 +387,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        self.button.destroy()
-        self.bills_button.destroy()
-        self.envelopes_button.destroy()
-        self.portfolio_button.destroy()
-        self.account_balance_button.destroy()
-        self.net_button.destroy()
-        self.investments_button.destroy()
-        self.exit_button.destroy()
+        # Destroy the previous widgets
+        self.destroy_widgets()
+
         self.main_menu()
         
     def main_menu(self):
@@ -328,6 +413,16 @@ class Display:
         self.exit_button.grid(row=4, column=2)
         self.music_button = tk.Button(text="Play Music", command=self.play_music)
         self.music_button.grid(row=3, column=2)
+
+        # Add widgets to active widgets list
+        self.active_widgets.append(self.instruction_label)
+        self.active_widgets.append(self.pay_button)
+        self.active_widgets.append(self.spend_button)
+        self.active_widgets.append(self.update_button)
+        self.active_widgets.append(self.view_button)
+        self.active_widgets.append(self.exit_button)
+        self.active_widgets.append(self.music_button)
+
         self.window.mainloop()
 
     def report_spending_from_main_menu(self):
@@ -338,13 +433,7 @@ class Display:
         """
 
         # Destroy the previous widgets
-        self.instruction_label.destroy()
-        self.pay_button.destroy()
-        self.spend_button.destroy()
-        self.update_button.destroy()
-        self.view_button.destroy()
-        self.exit_button.destroy()
-        self.music_button.destroy()
+        self.destroy_widgets()
 
         # Call new action
         self.report_spending()
@@ -452,6 +541,18 @@ class Display:
         self.amount_entry.bind("<KeyRelease>")
         self.submit_button.config(command=expenditure_submission)
 
+        # Add widgets to active widgets list
+        self.active_widgets.append(self.return_button)
+        self.active_widgets.append(self.header_label)
+        self.active_widgets.append(self.user_label)
+        self.active_widgets.append(self.category_label)
+        self.active_widgets.append(self.amount_label)
+        self.active_widgets.append(self.amount_entry)
+        self.active_widgets.append(self.category_menu)
+        self.active_widgets.append(self.user_menu)
+        self.active_widgets.append(self.submit_button)
+
+
     def main_menu_from_report_spending(self):
         """
         Destroy the previous widgets
@@ -460,16 +561,7 @@ class Display:
         """
 
         # Destroy the previous widgets
-        self.return_button.destroy()
-        self.header_label.destroy()
-        self.user_label.destroy()
-        self.category_label.destroy()
-        self.amount_label.destroy()
-        self.amount_entry.destroy()
-        self.category_menu.destroy()
-        self.user_menu.destroy()
-        if self.submit_button_exists:
-            self.submit_button.destroy()
+        self.destroy_widgets()
 
         # Call new action
         self.main_menu()
@@ -482,13 +574,7 @@ class Display:
         """
 
         # Destroy the previous widgets
-        self.instruction_label.destroy()
-        self.pay_button.destroy()
-        self.spend_button.destroy()
-        self.update_button.destroy()
-        self.view_button.destroy()
-        self.exit_button.destroy()
-        self.music_button.destroy()
+        self.destroy_widgets()
 
         # Call new action
         self.enter_paycheck()
@@ -553,6 +639,15 @@ class Display:
         self.paycheck_entry.bind("<KeyRelease>")
         self.submit_button.config(command=income_submission)
 
+        # Add widgets to active widgets list
+        self.active_widgets.append(self.paycheck_header_label)
+        self.active_widgets.append(self.return_button)
+        self.active_widgets.append(self.user_label)
+        self.active_widgets.append(self.user_menu)
+        self.active_widgets.append(self.paycheck_label)
+        self.active_widgets.append(self.paycheck_entry)
+        self.active_widgets.append(self.submit_button)
+
     def main_menu_from_enter_paycheck(self):
         """
         Destroy the previous widgets
@@ -561,14 +656,7 @@ class Display:
         """
 
         # Destroy the previous widgets
-        self.paycheck_header_label.destroy()
-        self.return_button.destroy()
-        self.user_label.destroy()
-        self.user_menu.destroy()
-        self.paycheck_label.destroy()
-        self.paycheck_entry.destroy()
-        if self.submit_button_exists:
-            self.submit_button.destroy()
+        self.destroy_widgets()
 
         # Call new action
         self.main_menu()
@@ -582,13 +670,7 @@ class Display:
         """
 
         # Destroy the previous widgets
-        self.paycheck_header_label.destroy()
-        self.return_button.destroy()
-        self.user_label.destroy()
-        self.paycheck_label.destroy()
-        self.paycheck_entry.destroy()
-        self.user_menu.destroy()
-        self.submit_button.destroy()
+        self.destroy_widgets()
 
         def help():
             """
@@ -702,6 +784,25 @@ class Display:
 
         self.play_money_jaden_envelope_label = tk.Label(text=f"Play Money Jaden: ${self.portfolio['envelope_system']['play_money']['jaden']}")
         self.play_money_jaden_envelope_label.grid(row=15, column=1)
+
+        # Add widgets to active widgets list
+        self.active_widgets.append(self.help_button)
+        self.active_widgets.append(self.user_label)
+        self.active_widgets.append(self.paycheck_label)
+        self.active_widgets.append(self.account_balance_label)
+        self.active_widgets.append(self.rent_envelope_label)
+        self.active_widgets.append(self.utilities_envelope_label)
+        self.active_widgets.append(self.phone_bill_envelope_label)
+        self.active_widgets.append(self.insurance_envelope_label)
+        self.active_widgets.append(self.groceries_envelope_label)
+        self.active_widgets.append(self.deep_savings_envelope_label)
+        self.active_widgets.append(self.rainy_day_fund_envelope_label)
+        self.active_widgets.append(self.date_night_envelope_label)
+        self.active_widgets.append(self.gas_envelope_label)
+        self.active_widgets.append(self.tithing_jacob_envelope_label)
+        self.active_widgets.append(self.tithing_jaden_envelope_label)
+        self.active_widgets.append(self.play_money_jacob_envelope_label)
+        self.active_widgets.append(self.play_money_jaden_envelope_label)
 
         # Entrys for the envelopes
         self.rent_envelope_entry = tk.Entry()
@@ -835,6 +936,22 @@ class Display:
         # Configure the submission button
         self.submit_envelopes_button.config(command=envelope_submission)
 
+        # Add the widgets to the active widgets list
+        self.active_widgets.append(self.rent_envelope_entry)
+        self.active_widgets.append(self.utilities_envelope_entry)
+        self.active_widgets.append(self.phone_bill_envelope_entry)
+        self.active_widgets.append(self.insurance_envelope_entry)
+        self.active_widgets.append(self.groceries_envelope_entry)
+        self.active_widgets.append(self.deep_savings_envelope_entry)
+        self.active_widgets.append(self.rainy_day_fund_envelope_entry)
+        self.active_widgets.append(self.date_night_envelope_entry)
+        self.active_widgets.append(self.gas_envelope_entry)
+        self.active_widgets.append(self.tithing_jacob_envelope_entry)
+        self.active_widgets.append(self.tithing_jaden_envelope_entry)
+        self.active_widgets.append(self.play_money_jacob_envelope_entry)
+        self.active_widgets.append(self.play_money_jaden_envelope_entry)
+        self.active_widgets.append(self.submit_envelopes_button)
+
     def view_portfolio_from_paycheck_submission(self):
         """
         Destroy the previous widgets
@@ -843,39 +960,7 @@ class Display:
         """
 
         # Destroy the previous widgets
-        self.user_label.destroy()
-        self.paycheck_label.destroy()
-        self.account_balance_label.destroy()
-        self.rent_envelope_label.destroy()
-        self.utilities_envelope_label.destroy()
-        self.phone_bill_envelope_label.destroy()
-        self.insurance_envelope_label.destroy()
-        self.groceries_envelope_label.destroy()
-        self.deep_savings_envelope_label.destroy()
-        self.rainy_day_fund_envelope_label.destroy()
-        self.date_night_envelope_label.destroy()
-        self.gas_envelope_label.destroy()
-        self.tithing_jacob_envelope_label.destroy()
-        self.tithing_jaden_envelope_label.destroy()
-        self.play_money_jacob_envelope_label.destroy()
-        self.play_money_jaden_envelope_label.destroy()
-
-        self.rent_envelope_entry.destroy()
-        self.utilities_envelope_entry.destroy()
-        self.phone_bill_envelope_entry.destroy()
-        self.insurance_envelope_entry.destroy()
-        self.groceries_envelope_entry.destroy()
-        self.deep_savings_envelope_entry.destroy()
-        self.rainy_day_fund_envelope_entry.destroy()
-        self.date_night_envelope_entry.destroy()
-        self.gas_envelope_entry.destroy()
-        self.tithing_jacob_envelope_entry.destroy()
-        self.tithing_jaden_envelope_entry.destroy()
-        self.play_money_jacob_envelope_entry.destroy()
-        self.play_money_jaden_envelope_entry.destroy()
-
-        self.submit_envelopes_button.destroy()
-        self.help_button.destroy()
+        self.destroy_widgets()
 
         # Call the new action
         self.view_portfolio()
@@ -932,14 +1017,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        self.instruction_label.destroy()
-        self.pay_button.destroy()
-        self.spend_button.destroy()
-        self.update_button.destroy()
-        self.view_button.destroy()
-        self.exit_button.destroy()
-        if self.user == "Jacob":
-            self.music_button.destroy()
+        # Destroy the previous widgets
+        self.destroy_widgets()
+
         self.update_info()
 
     def update_info(self):
@@ -961,6 +1041,15 @@ class Display:
         self.accounts_button.grid(row=1, column=3)
         self.exit_button = tk.Button(text="Exit", command=self.leave)
         self.exit_button.grid(row=4, column=2)
+
+        # add the widgets to the active widgets list
+        self.active_widgets.append(self.update_label)
+        self.active_widgets.append(self.button)
+        self.active_widgets.append(self.bills_button)
+        self.active_widgets.append(self.investments_button)
+        self.active_widgets.append(self.accounts_button)
+        self.active_widgets.append(self.exit_button)
+
         self.window.mainloop()
 
     def bills_from_update_info(self):
@@ -970,12 +1059,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        self.update_label.destroy()
-        self.button.destroy()
-        self.bills_button.destroy()
-        self.investments_button.destroy()
-        self.accounts_button.destroy()
-        self.exit_button.destroy()
+        # Destroy the previous widgets
+        self.destroy_widgets()
+
         self.update_bills()
 
     def update_bills(self):
@@ -1069,6 +1155,20 @@ class Display:
         # Configure the submission
         self.submit_button.configure(command=update_bills_submission)
 
+        # Add the widgets to the active widgets list
+        self.active_widgets.append(self.update_header_label)
+        self.active_widgets.append(self.return_button)
+        self.active_widgets.append(self.update_rent_label)
+        self.active_widgets.append(self.update_utilities_label)
+        self.active_widgets.append(self.update_phone_bill_label)
+        self.active_widgets.append(self.update_insurance_label)
+        self.active_widgets.append(self.update_rent_input)
+        self.active_widgets.append(self.update_utilities_input)
+        self.active_widgets.append(self.update_phone_bill_input)
+        self.active_widgets.append(self.update_insurance_input)
+        self.active_widgets.append(self.submit_button)
+
+
     def update_info_from_update_bills(self):
         """
         Destroy the previous widgets
@@ -1076,17 +1176,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        self.update_header_label.destroy()
-        self.return_button.destroy()
-        self.update_rent_label.destroy()
-        self.update_utilities_label.destroy()
-        self.update_phone_bill_label.destroy()
-        self.update_insurance_label.destroy()
-        self.update_rent_input.destroy()
-        self.update_utilities_input.destroy()
-        self.update_phone_bill_input.destroy()
-        self.update_insurance_input.destroy()
-        self.submit_button.destroy()
+        # Destroy the previous widgets
+        self.destroy_widgets()
+
         self.update_info()
 
     def investments_from_update_info(self):
@@ -1097,12 +1189,7 @@ class Display:
         """
 
         # Destroy the previous widgets
-        self.update_label.destroy()
-        self.button.destroy()
-        self.bills_button.destroy()
-        self.investments_button.destroy()
-        self.accounts_button.destroy()
-        self.exit_button.destroy()
+        self.destroy_widgets()
 
         # Call the action
         self.update_investments()
@@ -1114,13 +1201,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        self.investments_label.destroy()
-        self.button.destroy()
-        self.jacob_label.destroy()
-        self.jaden_label.destroy()
-        self.jacob_update_entry.destroy()
-        self.jaden_update_entry.destroy()
-        self.submit_button.destroy()
+        # Destroy the previous widgets
+        self.destroy_widgets()
+
         self.update_info()
 
     def update_investments(self):
@@ -1182,6 +1265,15 @@ class Display:
         # Configure the submit command
         self.submit_button.config(command=submission)
 
+        # Add the widgets to the active widgets list
+        self.active_widgets.append(self.investments_label)
+        self.active_widgets.append(self.jacob_label)
+        self.active_widgets.append(self.jaden_label)
+        self.active_widgets.append(self.jacob_update_entry)
+        self.active_widgets.append(self.jaden_update_entry)
+        self.active_widgets.append(self.submit_button)
+
+
     def update_accounts_from_update_info(self):
         """
         Destroy the previous widgets
@@ -1190,12 +1282,7 @@ class Display:
         """
 
         # Destroy the previous widgets
-        self.update_label.destroy()
-        self.button.destroy()
-        self.bills_button.destroy()
-        self.investments_button.destroy()
-        self.accounts_button.destroy()
-        self.exit_button.destroy()
+        self.destroy_widgets()
 
         # Call the action
         self.update_accounts()
@@ -1262,6 +1349,16 @@ class Display:
         # Configure the submit command
         self.submit_button.config(command=account_submission)
 
+        # Add the widgets to the active widgets list
+        self.active_widgets.append(self.button)
+        self.active_widgets.append(self.accounts_label)
+        self.active_widgets.append(self.jacob_checking_label)
+        self.active_widgets.append(self.jaden_checking_label)
+        self.active_widgets.append(self.jacob_checking_update_entry)
+        self.active_widgets.append(self.jaden_checking_update_entry)
+        self.active_widgets.append(self.submit_button)
+
+
     def update_info_from_update_accounts(self):
         """
         Destroy the previous widgets
@@ -1270,13 +1367,7 @@ class Display:
         """
 
         # Destroy the previous widgets
-        self.button.destroy()
-        self.accounts_label.destroy()
-        self.jacob_checking_label.destroy()
-        self.jaden_checking_label.destroy()
-        self.jacob_checking_update_entry.destroy()
-        self.jaden_checking_update_entry.destroy()
-        self.submit_button.destroy()
+        self.destroy_widgets()
 
         # Call the action
         self.update_info()
@@ -1289,12 +1380,7 @@ class Display:
         """
 
         # Destroy the previous widgets
-        self.update_label.destroy()
-        self.button.destroy()
-        self.bills_button.destroy()
-        self.investments_button.destroy()
-        self.accounts_button.destroy()
-        self.exit_button.destroy()
+        self.destroy_widgets()
 
         # Call the action
         self.main_menu()
@@ -1306,14 +1392,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        self.instruction_label.destroy()
-        self.pay_button.destroy()
-        self.spend_button.destroy()
-        self.update_button.destroy()
-        self.view_button.destroy()
-        self.exit_button.destroy()
-        if self.user == "Jacob":
-            self.music_button.destroy()
+        # Destroy the previous widgets
+        self.destroy_widgets()
+
         self.view_info()
 
     def view_info(self):
@@ -1339,6 +1420,17 @@ class Display:
         self.investments_button.grid(row=3, column=3)
         self.exit_button = tk.Button(text="Exit", command=self.leave)
         self.exit_button.grid(row=4, column=2)
+
+        # Add the widgets to the active widgets list
+        self.active_widgets.append(self.button)
+        self.active_widgets.append(self.bills_button)
+        self.active_widgets.append(self.envelopes_button)
+        self.active_widgets.append(self.portfolio_button)
+        self.active_widgets.append(self.account_balance_button)
+        self.active_widgets.append(self.net_button)
+        self.active_widgets.append(self.investments_button)
+        self.active_widgets.append(self.exit_button)
+
         self.window.mainloop()
 
     def view_net_from_view_info(self):
@@ -1348,14 +1440,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        self.button.destroy()
-        self.bills_button.destroy()
-        self.envelopes_button.destroy()
-        self.portfolio_button.destroy()
-        self.account_balance_button.destroy()
-        self.net_button.destroy()
-        self.investments_button.destroy()
-        self.exit_button.destroy()
+        # Destroy the previous widgets
+        self.destroy_widgets()
+
         self.view_net()
 
     def view_net(self):
@@ -1390,6 +1477,15 @@ class Display:
         self.exit_button = tk.Button(text="Exit", command=self.leave)
         self.exit_button.grid(row=4, column=2)
 
+        # Add the widgets to the active widgets list
+        self.active_widgets.append(self.return_button)
+        self.active_widgets.append(self.header_label)
+        self.active_widgets.append(self.jacob_net_label)
+        self.active_widgets.append(self.jaden_net_label)
+        self.active_widgets.append(self.total_net_label)
+        self.active_widgets.append(self.exit_button)
+
+
     def view_info_from_view_net(self):
         """
         Destroy the previous widgets
@@ -1397,12 +1493,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        self.return_button.destroy()
-        self.header_label.destroy()
-        self.jacob_net_label.destroy()
-        self.jaden_net_label.destroy()
-        self.total_net_label.destroy()
-        self.exit_button.destroy()
+        # Destroy the previous widgets
+        self.destroy_widgets()
+
         self.view_info()
 
     def view_investments_from_view_info(self):
@@ -1412,14 +1505,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        self.button.destroy()
-        self.bills_button.destroy()
-        self.envelopes_button.destroy()
-        self.portfolio_button.destroy()
-        self.account_balance_button.destroy()
-        self.net_button.destroy()
-        self.investments_button.destroy()
-        self.exit_button.destroy()
+        # Destroy the previous widgets
+        self.destroy_widgets()
+
         self.view_investments()
 
     def view_investments(self):
@@ -1454,6 +1542,14 @@ class Display:
         self.exit_button = tk.Button(text="Exit", command=self.leave)
         self.exit_button.grid(row=4, column=2)
 
+        # Add the widgets to the active widgets list
+        self.active_widgets.append(self.return_button)
+        self.active_widgets.append(self.label)
+        self.active_widgets.append(self.jacob_investments_label)
+        self.active_widgets.append(self.jaden_investments_label)
+        self.active_widgets.append(self.combined_investments_label)
+        self.active_widgets.append(self.exit_button)
+
         self.window.mainloop()
 
     def view_info_from_view_investments(self):
@@ -1463,12 +1559,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        self.return_button.destroy()
-        self.label.destroy()
-        self.jacob_investments_label.destroy()
-        self.jaden_investments_label.destroy()
-        self.combined_investments_label.destroy()
-        self.exit_button.destroy()
+        # Destroy the previous widgets
+        self.destroy_widgets()
+
         self.view_info()
 
     def view_account_balance_from_view_info(self):
@@ -1478,14 +1571,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        self.button.destroy()
-        self.bills_button.destroy()
-        self.envelopes_button.destroy()
-        self.portfolio_button.destroy()
-        self.account_balance_button.destroy()
-        self.net_button.destroy()
-        self.investments_button.destroy()
-        self.exit_button.destroy()
+        # Destroy the previous widgets
+        self.destroy_widgets()
+
         self.view_account_balance()
 
     def view_account_balance(self):
@@ -1515,6 +1603,14 @@ class Display:
         self.exit_button = tk.Button(text="Exit", command=self.leave)
         self.exit_button.grid(row=4, column=2)
 
+        # Add the widgets to the active widgets list
+        self.active_widgets.append(self.return_button)
+        self.active_widgets.append(self.header_label)
+        self.active_widgets.append(self.label)
+        self.active_widgets.append(self.label2)
+        self.active_widgets.append(self.label3)
+        self.active_widgets.append(self.exit_button)
+
         self.window.mainloop()
 
     def view_info_from_account_balance(self):
@@ -1524,12 +1620,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        self.return_button.destroy()
-        self.label.destroy()
-        self.label2.destroy()
-        self.label3.destroy()
-        self.header_label.destroy()
-        self.exit_button.destroy()
+        # Destroy the previous widgets
+        self.destroy_widgets()
+
         self.view_info()
         
     def view_portfolio_from_view_info(self):
@@ -1539,14 +1632,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        self.button.destroy()
-        self.bills_button.destroy()
-        self.envelopes_button.destroy()
-        self.portfolio_button.destroy()
-        self.account_balance_button.destroy()
-        self.net_button.destroy()
-        self.investments_button.destroy()
-        self.exit_button.destroy()
+        # Destroy the previous widgets
+        self.destroy_widgets()
+
         self.view_portfolio()
 
     def view_portfolio(self):
@@ -1647,6 +1735,32 @@ class Display:
         self.exit_button = tk.Button(text="Exit", command=self.leave)
         self.exit_button.grid(row=14, column=2)
         
+        # Add the widgets to the active widgets list
+        self.active_widgets.append(self.return_button)
+        self.active_widgets.append(self.label)
+        self.active_widgets.append(self.jacob_balance_label)
+        self.active_widgets.append(self.jaden_balance_label)
+        self.active_widgets.append(self.jacob_investments_label)
+        self.active_widgets.append(self.jaden_investments_label)
+        self.active_widgets.append(self.jacob_tithing_label)
+        self.active_widgets.append(self.jaden_tithing_label)
+        self.active_widgets.append(self.jacob_play_money_label)
+        self.active_widgets.append(self.jaden_play_money_label)
+        self.active_widgets.append(self.rent_label)
+        self.active_widgets.append(self.utilities_label)
+        self.active_widgets.append(self.phone_bill_label)
+        self.active_widgets.append(self.insurance_label)
+        self.active_widgets.append(self.rent_envelope_label)
+        self.active_widgets.append(self.utilities_envelope_label)
+        self.active_widgets.append(self.phone_bill_envelope_label)
+        self.active_widgets.append(self.insurance_envelope_label)
+        self.active_widgets.append(self.gas_envelope_label)
+        self.active_widgets.append(self.groceries_envelope_label)
+        self.active_widgets.append(self.deep_savings_envelope_label)
+        self.active_widgets.append(self.rainy_day_envelope_label)
+        self.active_widgets.append(self.date_night_envelope_label)
+        self.active_widgets.append(self.exit_button)
+
         self.window.mainloop()
 
     def view_info_from_view_portfolio(self):
@@ -1656,30 +1770,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        self.return_button.destroy()
-        self.label.destroy()
-        self.jacob_balance_label.destroy()
-        self.jaden_balance_label.destroy()
-        self.jacob_investments_label.destroy()
-        self.jaden_investments_label.destroy()
-        self.rent_label.destroy()
-        self.utilities_label.destroy()
-        self.phone_bill_label.destroy()
-        self.insurance_label.destroy()
-        self.rent_envelope_label.destroy()
-        self.utilities_envelope_label.destroy()
-        self.phone_bill_envelope_label.destroy()
-        self.insurance_envelope_label.destroy()
-        self.jacob_play_money_label.destroy()
-        self.jaden_play_money_label.destroy()
-        self.groceries_envelope_label.destroy()
-        self.deep_savings_envelope_label.destroy()
-        self.rainy_day_envelope_label.destroy()
-        self.date_night_envelope_label.destroy()
-        self.gas_envelope_label.destroy()
-        self.jacob_tithing_label.destroy()
-        self.jaden_tithing_label.destroy()
-        self.exit_button.destroy()
+        # Destroy the previous widgets
+        self.destroy_widgets()
+
         self.view_info()
 
     def view_envelopes_from_view_info(self):
@@ -1689,14 +1782,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        self.button.destroy()
-        self.bills_button.destroy()
-        self.envelopes_button.destroy()
-        self.portfolio_button.destroy()
-        self.account_balance_button.destroy()
-        self.net_button.destroy()
-        self.investments_button.destroy()
-        self.exit_button.destroy()
+        # Destroy the previous widgets
+        self.destroy_widgets()
+
         self.view_envelopes()
 
     def view_envelopes(self):
@@ -1783,6 +1871,23 @@ class Display:
         self.exit_button = tk.Button(text="Exit", command=self.leave)
         self.exit_button.grid(row=10, column=2)
 
+        # Add the widgets to the active widgets list
+        self.active_widgets.append(self.return_button)
+        self.active_widgets.append(self.rent_envelope_label)
+        self.active_widgets.append(self.utilities_envelope_label)
+        self.active_widgets.append(self.phone_bill_envelope_label)
+        self.active_widgets.append(self.insurance_envelope_label)
+        self.active_widgets.append(self.jacob_play_money_label)
+        self.active_widgets.append(self.jaden_play_money_label)
+        self.active_widgets.append(self.groceries_envelope_label)
+        self.active_widgets.append(self.deep_savings_envelope_label)
+        self.active_widgets.append(self.rainy_day_envelope_label)
+        self.active_widgets.append(self.date_night_envelope_label)
+        self.active_widgets.append(self.gas_envelope_label)
+        self.active_widgets.append(self.jacob_tithing_label)
+        self.active_widgets.append(self.jaden_tithing_label)
+        self.active_widgets.append(self.exit_button)
+
         self.window.mainloop()
 
     def view_info_from_view_envelopes(self):
@@ -1792,22 +1897,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        self.return_button.destroy()
-        self.rent_envelope_label.destroy()
-        self.utilities_envelope_label.destroy()
-        self.phone_bill_envelope_label.destroy()
-        self.insurance_envelope_label.destroy()
-        self.jacob_play_money_label.destroy()
-        self.jaden_play_money_label.destroy()
-        self.groceries_envelope_label.destroy()
-        self.deep_savings_envelope_label.destroy()
-        self.rainy_day_envelope_label.destroy()
-        self.date_night_envelope_label.destroy()
-        self.gas_envelope_label.destroy()
-        self.jacob_tithing_label.destroy()
-        self.jaden_tithing_label.destroy()
-        self.header_label.destroy()
-        self.exit_button.destroy()
+        # Destroy the previous widgets
+        self.destroy_widgets()
+
         self.view_info()
 
     def view_bills_from_view_info(self):
@@ -1817,14 +1909,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        self.button.destroy()
-        self.bills_button.destroy()
-        self.envelopes_button.destroy()
-        self.portfolio_button.destroy()
-        self.account_balance_button.destroy()
-        self.net_button.destroy()
-        self.investments_button.destroy()
-        self.exit_button.destroy()
+        # Destroy the previous widgets
+        self.destroy_widgets()
+
         self.view_bills()
 
     def view_bills(self):
@@ -1863,6 +1950,16 @@ class Display:
         # Exit
         self.exit_button = tk.Button(text="Exit", command=self.leave)
         self.exit_button.grid(row=4, column=2)
+
+        # Add the widgets to the active widgets list
+        self.active_widgets.append(self.return_button)
+        self.active_widgets.append(self.header_label)
+        self.active_widgets.append(self.rent_label)
+        self.active_widgets.append(self.utilities_label)
+        self.active_widgets.append(self.phone_label)
+        self.active_widgets.append(self.insurance_label)
+        self.active_widgets.append(self.exit_button)
+
         self.window.mainloop()
 
     def view_info_from_view_bills(self):
@@ -1872,13 +1969,9 @@ class Display:
         Outputs: Directs to the appropriate action
         """
 
-        self.return_button.destroy()
-        self.header_label.destroy()
-        self.rent_label.destroy()
-        self.utilities_label.destroy()
-        self.phone_label.destroy()
-        self.insurance_label.destroy()
-        self.exit_button.destroy()
+        # Destroy the previous widgets
+        self.destroy_widgets()
+
         self.view_info()
 
     def leave(self):
