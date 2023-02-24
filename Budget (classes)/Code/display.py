@@ -248,7 +248,7 @@ class Display:
         self.update_system_info()
 
         if self.user == "Jaden":
-            complement_list = ["You are looking great today!", "What a sexy wife", "Your butt looks fantastic", "Your boobs look great", "I can't wait to kiss you", "Lets slip into the bedroom for a bit"]
+            complement_list = ["You are looking great today!"]
             self.label2 = tk.Label(text=random.choice(complement_list))
             self.label2.grid(row=4, column=2)
         elif self.user == "Jacob":
